@@ -1,6 +1,6 @@
 plugins {
 	id 'java'
-	id 'org.springframework.boot' version '3.5.0-SNAPSHOT'
+	id 'org.springframework.boot' version '2.7.9'  // Используем стабильную версию Spring Boot
 	id 'io.spring.dependency-management' version '1.1.7'
 }
 
@@ -15,18 +15,25 @@ java {
 
 repositories {
 	mavenCentral()
-	maven { url 'https://repo.spring.io/milestone' }
-	maven { url 'https://repo.spring.io/snapshot' }
 }
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'com.h2database:h2'  // Зависимость для H2 базы данных
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.mockito:mockito-core:4.2.0'
+	runtimeOnly 'org.postgresql:postgresql'
 	testImplementation 'org.mockito:mockito-junit-jupiter:4.2.0'
+
+}
+
+
+
+tasks.named('bootJar') {
+	archiveFileName = 'taskmanager-0.0.1-SNAPSHOT.jar'
 }
 
 tasks.named('test') {
