@@ -1,3 +1,28 @@
 spring:
   profiles:
-    active: in-memory
+    active: in-memory  # Для обычного режима работы, например, для разработки
+
+---
+spring:
+  profiles: postgres
+  datasource:
+    url: jdbc:postgresql://db:5432/taskdb
+    username: postgres
+    password: password
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+---
+spring:
+  profiles: test
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1
+    driverClassName: org.h2.Driver
+    username: sa
+    password: password
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true

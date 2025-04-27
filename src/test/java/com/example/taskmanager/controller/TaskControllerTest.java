@@ -4,21 +4,19 @@ import com.example.taskmanager.model.Task;
 import com.example.taskmanager.service.TaskService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.List;
 
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)  // важно!
 class TaskControllerTest {
 
     @InjectMocks
@@ -42,7 +40,7 @@ class TaskControllerTest {
 
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertEquals(task, response.getBody());
-        verify(taskService, times(1)).createTask(any(Task.class)); // проверяем, что метод был вызван 1 раз
+        verify(taskService, times(1)).createTask(any(Task.class));
     }
 
     @Test
@@ -62,6 +60,6 @@ class TaskControllerTest {
         ResponseEntity<Void> response = taskController.deleteTask(1L);
 
         assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
-        verify(taskService, times(1)).deleteTask(anyLong());  // проверяем, что метод был вызван 1 раз
+        verify(taskService, times(1)).deleteTask(anyLong());
     }
 }

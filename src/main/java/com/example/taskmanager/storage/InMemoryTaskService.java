@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 
-@Profile("in-memory")
 @Service
 public class InMemoryTaskService implements TaskService {
 
