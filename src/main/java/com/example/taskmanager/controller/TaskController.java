@@ -52,6 +52,30 @@ public class TaskController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @PostMapping("/{id}/complete")
+    public ResponseEntity<Task> completeTask(@PathVariable String id, @RequestParam(required = false) String user) {
+        if (user == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        return userService.findByUsername(user)
+                .map(u -> ResponseEntity.ok(taskService.completeTask(id)))
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Task> updateTask(@PathVariable String id, @RequestBody Task task, @RequestParam(required = false) String user) {
+        if (user == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        return userService.findByUsername(user)
+                .map(u -> {
+                    task.setId(id);
+                    task.setUserId(u.getId());
+                    return ResponseEntity.ok(taskService.updateTask(task));
+                })
+                .orElse(ResponseEntity.notFound().build());
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTask(@PathVariable String id) {
         taskService.deleteTask(id);
