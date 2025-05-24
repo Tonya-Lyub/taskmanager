@@ -3,6 +3,7 @@ package com.example.taskmanager.model;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -10,7 +11,9 @@ import java.util.UUID;
 @Table(name = "tasks")
 @Data
 @NoArgsConstructor
-public class Task {
+public class Task implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
