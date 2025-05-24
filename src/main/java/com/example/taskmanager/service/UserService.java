@@ -1,26 +1,35 @@
 package com.example.taskmanager.service;
 
 import com.example.taskmanager.model.User;
-import com.example.taskmanager.storage.UserStorage;
+import com.example.taskmanager.repository.UserRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 
 @Service
+@Transactional
 public class UserService {
-    private final UserStorage userStorage;
+    private final UserRepository userRepository;
 
-    public UserService(UserStorage userStorage) {
-        this.userStorage = userStorage;
+    public UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
     public User registerUser(User user) {
-        if (userStorage.findByUsername(user.getUsername()).isPresent()) {
+        if (userRepository.existsByUsername(user.getUsername())) {
             throw new RuntimeException("Username already exists");
         }
-        return userStorage.save(user);
+        if (userRepository.existsByEmail(user.getEmail())) {
+            throw new RuntimeException("Email already exists");
+        }
+        return userRepository.save(user);
     }
 
     public Optional<User> findByUsername(String username) {
-        return userStorage.findByUsername(username);
+        return userRepository.findByUsername(username);
+    }
+
+    public Optional<User> findByEmail(String email) {
+        return userRepository.findByEmail(email);
     }
 } 

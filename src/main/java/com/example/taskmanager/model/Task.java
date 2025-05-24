@@ -1,94 +1,52 @@
 package com.example.taskmanager.model;
 
+import jakarta.persistence.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+@Entity
+@Table(name = "tasks")
+@Data
+@NoArgsConstructor
 public class Task {
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
+
+    @Column(nullable = false)
     private String title;
+
+    @Column(length = 1000)
     private String description;
+
+    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
+
+    @Column(name = "due_at")
     private LocalDateTime dueAt;
+
+    @Column(nullable = false)
     private boolean completed;
+
+    @Column(nullable = false)
     private boolean deleted;
+
+    @Column(name = "user_id", nullable = false)
     private String userId;
 
-    public Task() {
-        this.id = UUID.randomUUID().toString();
+    @PrePersist
+    protected void onCreate() {
         this.createdAt = LocalDateTime.now();
         this.completed = false;
         this.deleted = false;
     }
 
     public Task(String title, String description, LocalDateTime dueAt, String userId) {
-        this();
         this.title = title;
         this.description = description;
         this.dueAt = dueAt;
-        this.userId = userId;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getDueAt() {
-        return dueAt;
-    }
-
-    public void setDueAt(LocalDateTime dueAt) {
-        this.dueAt = dueAt;
-    }
-
-    public boolean isCompleted() {
-        return completed;
-    }
-
-    public void setCompleted(boolean completed) {
-        this.completed = completed;
-    }
-
-    public boolean isDeleted() {
-        return deleted;
-    }
-
-    public void setDeleted(boolean deleted) {
-        this.deleted = deleted;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
         this.userId = userId;
     }
 } 

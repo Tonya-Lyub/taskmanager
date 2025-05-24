@@ -1,7 +1,7 @@
 package com.example.taskmanager.service;
 
 import com.example.taskmanager.model.User;
-import com.example.taskmanager.storage.UserStorage;
+import com.example.taskmanager.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,21 +16,22 @@ import static org.mockito.Mockito.*;
 class UserServiceTest {
 
     @Mock
-    private UserStorage userStorage;
+    private UserRepository userRepository;
 
     private UserService userService;
 
     @BeforeEach
     void setUp() {
-        userService = new UserService(userStorage);
+        userService = new UserService(userRepository);
     }
 
     @Test
     void registerUser_ShouldSaveAndReturnUser() {
         // Arrange
         User user = new User("testuser", "test@example.com");
-        when(userStorage.findByUsername("testuser")).thenReturn(Optional.empty());
-        when(userStorage.save(any(User.class))).thenReturn(user);
+        when(userRepository.existsByUsername("testuser")).thenReturn(false);
+        when(userRepository.existsByEmail("test@example.com")).thenReturn(false);
+        when(userRepository.save(any(User.class))).thenReturn(user);
 
         // Act
         User result = userService.registerUser(user);
@@ -38,25 +39,37 @@ class UserServiceTest {
         // Assert
         assertNotNull(result);
         assertEquals("testuser", result.getUsername());
-        verify(userStorage).save(user);
+        verify(userRepository).save(user);
     }
 
     @Test
     void registerUser_ShouldThrowException_WhenUsernameExists() {
         // Arrange
         User user = new User("testuser", "test@example.com");
-        when(userStorage.findByUsername("testuser")).thenReturn(Optional.of(user));
+        when(userRepository.existsByUsername("testuser")).thenReturn(true);
 
         // Act & Assert
         assertThrows(RuntimeException.class, () -> userService.registerUser(user));
-        verify(userStorage, never()).save(any(User.class));
+        verify(userRepository, never()).save(any(User.class));
+    }
+
+    @Test
+    void registerUser_ShouldThrowException_WhenEmailExists() {
+        // Arrange
+        User user = new User("testuser", "test@example.com");
+        when(userRepository.existsByUsername("testuser")).thenReturn(false);
+        when(userRepository.existsByEmail("test@example.com")).thenReturn(true);
+
+        // Act & Assert
+        assertThrows(RuntimeException.class, () -> userService.registerUser(user));
+        verify(userRepository, never()).save(any(User.class));
     }
 
     @Test
     void findByUsername_ShouldReturnUser_WhenExists() {
         // Arrange
         User expectedUser = new User("testuser", "test@example.com");
-        when(userStorage.findByUsername("testuser")).thenReturn(Optional.of(expectedUser));
+        when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(expectedUser));
 
         // Act
         Optional<User> result = userService.findByUsername("testuser");
@@ -69,10 +82,36 @@ class UserServiceTest {
     @Test
     void findByUsername_ShouldReturnEmpty_WhenUserDoesNotExist() {
         // Arrange
-        when(userStorage.findByUsername("nonexistent")).thenReturn(Optional.empty());
+        when(userRepository.findByUsername("nonexistent")).thenReturn(Optional.empty());
 
         // Act
         Optional<User> result = userService.findByUsername("nonexistent");
+
+        // Assert
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void findByEmail_ShouldReturnUser_WhenExists() {
+        // Arrange
+        User expectedUser = new User("testuser", "test@example.com");
+        when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(expectedUser));
+
+        // Act
+        Optional<User> result = userService.findByEmail("test@example.com");
+
+        // Assert
+        assertTrue(result.isPresent());
+        assertEquals("test@example.com", result.get().getEmail());
+    }
+
+    @Test
+    void findByEmail_ShouldReturnEmpty_WhenUserDoesNotExist() {
+        // Arrange
+        when(userRepository.findByEmail("nonexistent@example.com")).thenReturn(Optional.empty());
+
+        // Act
+        Optional<User> result = userService.findByEmail("nonexistent@example.com");
 
         // Assert
         assertTrue(result.isEmpty());

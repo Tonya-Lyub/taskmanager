@@ -1,7 +1,7 @@
 package com.example.taskmanager.service;
 
 import com.example.taskmanager.model.Notification;
-import com.example.taskmanager.storage.NotificationStorage;
+import com.example.taskmanager.repository.NotificationRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -9,6 +9,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -17,20 +18,20 @@ import static org.mockito.Mockito.*;
 class NotificationServiceTest {
 
     @Mock
-    private NotificationStorage notificationStorage;
+    private NotificationRepository notificationRepository;
 
     private NotificationService notificationService;
 
     @BeforeEach
     void setUp() {
-        notificationService = new NotificationService(notificationStorage);
+        notificationService = new NotificationService(notificationRepository);
     }
 
     @Test
     void createNotification_ShouldSaveAndReturnNotification() {
         // Arrange
         Notification notification = new Notification("Test notification", "user1");
-        when(notificationStorage.save(any(Notification.class))).thenReturn(notification);
+        when(notificationRepository.save(any(Notification.class))).thenReturn(notification);
 
         // Act
         Notification result = notificationService.createNotification(notification);
@@ -38,7 +39,7 @@ class NotificationServiceTest {
         // Assert
         assertNotNull(result);
         assertEquals("Test notification", result.getMessage());
-        verify(notificationStorage).save(notification);
+        verify(notificationRepository).save(notification);
     }
 
     @Test
@@ -49,14 +50,14 @@ class NotificationServiceTest {
             new Notification("Notification 1", userId),
             new Notification("Notification 2", userId)
         );
-        when(notificationStorage.findByUserId(userId)).thenReturn(expectedNotifications);
+        when(notificationRepository.findByUserIdOrderByCreatedAtDesc(userId)).thenReturn(expectedNotifications);
 
         // Act
         List<Notification> result = notificationService.getAllNotifications(userId);
 
         // Assert
         assertEquals(2, result.size());
-        verify(notificationStorage).findByUserId(userId);
+        verify(notificationRepository).findByUserIdOrderByCreatedAtDesc(userId);
     }
 
     @Test
@@ -67,25 +68,44 @@ class NotificationServiceTest {
             new Notification("Notification 1", userId),
             new Notification("Notification 2", userId)
         );
-        when(notificationStorage.findPendingByUserId(userId)).thenReturn(expectedNotifications);
+        when(notificationRepository.findByUserIdAndReadFalseOrderByCreatedAtDesc(userId)).thenReturn(expectedNotifications);
 
         // Act
         List<Notification> result = notificationService.getPendingNotifications(userId);
 
         // Assert
         assertEquals(2, result.size());
-        verify(notificationStorage).findPendingByUserId(userId);
+        verify(notificationRepository).findByUserIdAndReadFalseOrderByCreatedAtDesc(userId);
     }
 
     @Test
     void markAsRead_ShouldMarkNotificationAsRead() {
         // Arrange
         String notificationId = "notification1";
+        Notification notification = new Notification("Test notification", "user1");
+        when(notificationRepository.findById(notificationId)).thenReturn(Optional.of(notification));
+        when(notificationRepository.save(any(Notification.class))).thenReturn(notification);
 
         // Act
         notificationService.markAsRead(notificationId);
 
         // Assert
-        verify(notificationStorage).markAsRead(notificationId);
+        assertTrue(notification.isRead());
+        verify(notificationRepository).findById(notificationId);
+        verify(notificationRepository).save(notification);
+    }
+
+    @Test
+    void markAsRead_ShouldDoNothing_WhenNotificationNotFound() {
+        // Arrange
+        String notificationId = "notification1";
+        when(notificationRepository.findById(notificationId)).thenReturn(Optional.empty());
+
+        // Act
+        notificationService.markAsRead(notificationId);
+
+        // Assert
+        verify(notificationRepository).findById(notificationId);
+        verify(notificationRepository, never()).save(any(Notification.class));
     }
 } 
