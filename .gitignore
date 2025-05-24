@@ -40,6 +40,8 @@ out/
 .docker/
 docker-compose.override.yml
 
-### Application ###
-application-local.properties
-application-dev.properties
+### Application Specific ###
+*.log
+*.db
+*.db-journal
+postgres_data/
