@@ -1,64 +1,39 @@
 package com.example.taskmanager.model;
 
+import jakarta.persistence.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
-import java.util.UUID;
 
+@Entity
+@Table(name = "notifications")
+@Data
+@NoArgsConstructor
 public class Notification {
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
+
+    @Column(nullable = false)
     private String message;
+
+    @Column(name = "user_id", nullable = false)
     private String userId;
+
+    @Column(nullable = false)
     private boolean read;
+
+    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    public Notification() {
-        this.id = UUID.randomUUID().toString();
+    @PrePersist
+    protected void onCreate() {
         this.createdAt = LocalDateTime.now();
         this.read = false;
     }
 
     public Notification(String message, String userId) {
-        this();
         this.message = message;
         this.userId = userId;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    public boolean isRead() {
-        return read;
-    }
-
-    public void setRead(boolean read) {
-        this.read = read;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
     }
 } 
