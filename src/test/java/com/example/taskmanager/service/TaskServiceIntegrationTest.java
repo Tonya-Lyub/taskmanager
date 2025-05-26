@@ -6,6 +6,7 @@ import com.example.taskmanager.model.Notification;
 import com.example.taskmanager.repository.TaskRepository;
 import com.example.taskmanager.repository.NotificationRepository;
 import com.example.taskmanager.messaging.MessagePublisher;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -18,9 +19,11 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -40,11 +43,29 @@ class TaskServiceIntegrationTest {
 
     @Container
     static GenericContainer<?> redis = new GenericContainer<>("redis:7-alpine")
-            .withExposedPorts(6379);
+            .withExposedPorts(6379)
+            .withCommand("redis-server --requirepass redispassword")
+            .withReuse(true)
+            .waitingFor(Wait.forListeningPort());
 
     @Container
     static GenericContainer<?> rabbitmq = new GenericContainer<>("rabbitmq:3-management")
-            .withExposedPorts(5672, 15672);
+            .withExposedPorts(5672, 15672)
+            .withReuse(true);
+
+    @BeforeAll
+    static void beforeAll() {
+        postgres.start();
+        redis.start();
+        rabbitmq.start();
+        
+        // Даем время на инициализацию Redis
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
 
     @MockBean
     private MessagePublisher messagePublisher;
@@ -69,10 +90,13 @@ class TaskServiceIntegrationTest {
         registry.add("spring.datasource.url", postgres::getJdbcUrl);
         registry.add("spring.datasource.username", postgres::getUsername);
         registry.add("spring.datasource.password", postgres::getPassword);
-        registry.add("spring.redis.host", redis::getHost);
-        registry.add("spring.redis.port", redis::getFirstMappedPort);
+        registry.add("spring.data.redis.host", redis::getHost);
+        registry.add("spring.data.redis.port", redis::getFirstMappedPort);
+        registry.add("spring.data.redis.password", () -> "redispassword");
         registry.add("spring.rabbitmq.host", rabbitmq::getHost);
         registry.add("spring.rabbitmq.port", rabbitmq::getFirstMappedPort);
+        registry.add("spring.rabbitmq.username", () -> "guest");
+        registry.add("spring.rabbitmq.password", () -> "guest");
     }
 
     @BeforeEach

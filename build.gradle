@@ -39,6 +39,7 @@ dependencies {
 	implementation 'org.postgresql:postgresql'
 	implementation 'com.fasterxml.jackson.core:jackson-databind'
 	implementation 'org.springframework.boot:spring-boot-starter-aop'
+	implementation 'org.apache.commons:commons-pool2'
 	compileOnly 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	annotationProcessor 'org.projectlombok:lombok'
@@ -52,7 +53,11 @@ dependencies {
 	testImplementation 'org.postgresql:postgresql'
 	testImplementation 'org.springframework.boot:spring-boot-starter-data-redis'
 	testImplementation 'org.springframework.boot:spring-boot-starter-aop'
+	testImplementation 'org.apache.commons:commons-pool2'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	testImplementation 'org.springframework.amqp:spring-rabbit-test'
+	testImplementation 'org.springframework.boot:spring-boot-starter-amqp'
+	testImplementation 'org.testcontainers:rabbitmq'
 }
 
 tasks.named('test') {

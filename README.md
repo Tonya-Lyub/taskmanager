@@ -1,53 +1,65 @@
 # Task Manager
 
-Приложение для управления задачами, построенное на Spring Boot.
+Система управления задачами с поддержкой уведомлений и кэширования.
 
 ## Технологии
 
 - Java 17
-- Spring Boot 3.2.3
-- PostgreSQL 15
-- Flyway для миграций базы данных
-- Docker и Docker Compose
-- JUnit 5 и TestContainers для тестирования
+- Spring Boot
+- PostgreSQL
+- Redis
+- RabbitMQ
+- Docker
+- Gradle
 
 ## Требования
 
-- JDK 17 или выше
 - Docker и Docker Compose
-- Gradle 8.x
+- JDK 17
+- Gradle
 
-## Запуск приложения
+## Запуск
 
-### Локальный запуск
-
-1. Запустите PostgreSQL:
+1. Клонируйте репозиторий:
 ```bash
-docker compose up -d db
+git clone https://github.com/yourusername/taskmanager.git
 ```
 
-2. Запустите приложение:
+2. Запустите приложение с помощью Docker Compose:
 ```bash
-./gradlew bootRun --args='--spring.profiles.active=postgres'
+docker-compose up --build
 ```
 
-### Запуск в Docker
+## API Endpoints
 
-```bash
-docker compose up --build
-```
+### Задачи
+- `POST /api/tasks` - Создание задачи
+- `GET /api/tasks` - Получение списка задач
+- `GET /api/tasks/{id}` - Получение задачи по ID
+- `PUT /api/tasks/{id}` - Обновление задачи
+- `DELETE /api/tasks/{id}` - Удаление задачи
+
+### Пользователи
+- `POST /api/users` - Создание пользователя
+- `GET /api/users` - Получение списка пользователей
+- `GET /api/users/{id}` - Получение пользователя по ID
+
+### Уведомления
+- `GET /api/notifications` - Получение списка уведомлений
+- `GET /api/notifications/{id}` - Получение уведомления по ID
 
 ## Тестирование
 
-### Запуск тестов
-
+Запуск тестов:
 ```bash
 ./gradlew test
 ```
 
-### Интеграционные тесты
+## Профили
 
-Интеграционные тесты используют TestContainers для создания изолированной PostgreSQL базы данных.
+- `rabbit` - Активация RabbitMQ
+- `redis` - Активация Redis кэширования
+- `postgres` - Использование PostgreSQL
 
 ## Структура проекта
 
@@ -55,20 +67,6 @@ docker compose up --build
 - `src/main/resources` - конфигурационные файлы
 - `src/main/resources/db/migration` - миграции базы данных
 - `src/test` - тесты
-
-## Профили
-
-- `postgres` - основной профиль с PostgreSQL
-- `inmemory` - профиль с хранением в памяти (для тестирования)
-
-## API Endpoints
-
-- `POST /users` - регистрация нового пользователя
-- `GET /users/{username}` - получение информации о пользователе
-- `POST /tasks` - создание новой задачи
-- `GET /tasks` - получение списка задач
-- `PUT /tasks/{id}` - обновление задачи
-- `DELETE /tasks/{id}` - удаление задачи
 
 ## База данных
 
