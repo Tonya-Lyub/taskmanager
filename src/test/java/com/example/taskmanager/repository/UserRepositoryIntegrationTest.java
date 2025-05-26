@@ -29,8 +29,7 @@ class UserRepositoryIntegrationTest {
             .withUsername("postgres")
             .withPassword("postgres")
             .withInitScript("init.sql")
-            .withReuse(true)
-            .withInitScript("init.sql");
+            .withReuse(true);
 
     @DynamicPropertySource
     static void configureProperties(DynamicPropertyRegistry registry) {

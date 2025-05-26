@@ -1,15 +1,19 @@
 package com.example.taskmanager.model;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "notifications")
 @Data
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 public class Notification implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -23,6 +27,9 @@ public class Notification implements Serializable {
     @Column(name = "user_id", nullable = false)
     private String userId;
 
+    @Column(name = "task_id", nullable = false)
+    private String taskId;
+
     @Column(nullable = false)
     private boolean read;
 
@@ -33,10 +40,5 @@ public class Notification implements Serializable {
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
         this.read = false;
-    }
-
-    public Notification(String message, String userId) {
-        this.message = message;
-        this.userId = userId;
     }
 } 

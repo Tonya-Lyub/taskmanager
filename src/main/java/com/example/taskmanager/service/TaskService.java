@@ -1,5 +1,6 @@
 package com.example.taskmanager.service;
 
+import com.example.taskmanager.messaging.MessagePublisher;
 import com.example.taskmanager.model.Task;
 import com.example.taskmanager.repository.TaskRepository;
 import org.springframework.cache.annotation.CacheEvict;
@@ -12,9 +13,11 @@ import java.util.List;
 @Transactional
 public class TaskService {
     private final TaskRepository taskRepository;
+    private final MessagePublisher messagePublisher;
 
-    public TaskService(TaskRepository taskRepository) {
+    public TaskService(TaskRepository taskRepository, MessagePublisher messagePublisher) {
         this.taskRepository = taskRepository;
+        this.messagePublisher = messagePublisher;
     }
 
     @Cacheable(value = "tasks", key = "#userId", unless = "#result.isEmpty()")
@@ -29,7 +32,9 @@ public class TaskService {
 
     @CacheEvict(value = {"tasks", "pendingTasks"}, key = "#task.userId")
     public Task createTask(Task task) {
-        return taskRepository.save(task);
+        Task savedTask = taskRepository.save(task);
+        messagePublisher.publishTaskCreated(savedTask);
+        return savedTask;
     }
 
     @CacheEvict(value = {"tasks", "pendingTasks"}, key = "#task.userId")

@@ -20,7 +20,9 @@ CREATE TABLE notifications (
     id VARCHAR(255) PRIMARY KEY,
     message VARCHAR(255) NOT NULL,
     user_id VARCHAR(255) NOT NULL,
+    task_id VARCHAR(255) NOT NULL,
     read BOOLEAN NOT NULL DEFAULT FALSE,
     created_at TIMESTAMP NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES users(id)
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (task_id) REFERENCES tasks(id)
 ); 
