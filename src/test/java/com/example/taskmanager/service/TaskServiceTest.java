@@ -2,6 +2,7 @@ package com.example.taskmanager.service;
 
 import com.example.taskmanager.model.Task;
 import com.example.taskmanager.repository.TaskRepository;
+import com.example.taskmanager.messaging.MessagePublisher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,11 +22,14 @@ class TaskServiceTest {
     @Mock
     private TaskRepository taskRepository;
 
+    @Mock
+    private MessagePublisher messagePublisher;
+
     private TaskService taskService;
 
     @BeforeEach
     void setUp() {
-        taskService = new TaskService(taskRepository);
+        taskService = new TaskService(taskRepository, messagePublisher);
     }
 
     @Test
@@ -41,6 +45,7 @@ class TaskServiceTest {
         assertNotNull(result);
         assertEquals("Test Task", result.getTitle());
         verify(taskRepository).save(task);
+        verify(messagePublisher).publishTaskCreated(task);
     }
 
     @Test

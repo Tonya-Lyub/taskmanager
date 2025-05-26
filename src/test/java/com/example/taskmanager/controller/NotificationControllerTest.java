@@ -41,8 +41,8 @@ class NotificationControllerTest {
         String username = "testuser";
         User user = new User(username, "test@example.com");
         List<Notification> notifications = Arrays.asList(
-            new Notification("Notification 1", user.getId()),
-            new Notification("Notification 2", user.getId())
+            Notification.builder().message("Notification 1").userId(user.getId()).read(false).createdAt(LocalDateTime.now()).build(),
+            Notification.builder().message("Notification 2").userId(user.getId()).read(false).createdAt(LocalDateTime.now()).build()
         );
         when(userService.findByUsername(username)).thenReturn(Optional.of(user));
         when(notificationService.getAllNotifications(user.getId())).thenReturn(notifications);
@@ -74,8 +74,8 @@ class NotificationControllerTest {
         String username = "testuser";
         User user = new User(username, "test@example.com");
         List<Notification> notifications = Arrays.asList(
-            new Notification("Notification 1", user.getId()),
-            new Notification("Notification 2", user.getId())
+            Notification.builder().message("Notification 1").userId(user.getId()).read(false).createdAt(LocalDateTime.now()).build(),
+            Notification.builder().message("Notification 2").userId(user.getId()).read(false).createdAt(LocalDateTime.now()).build()
         );
         when(userService.findByUsername(username)).thenReturn(Optional.of(user));
         when(notificationService.getPendingNotifications(user.getId())).thenReturn(notifications);

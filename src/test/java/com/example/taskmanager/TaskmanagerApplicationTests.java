@@ -1,7 +1,9 @@
 package com.example.taskmanager;
 
+import com.example.taskmanager.messaging.MessagePublisher;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -19,6 +21,9 @@ class TaskmanagerApplicationTests {
 			.withDatabaseName("taskdb")
 			.withUsername("postgres")
 			.withPassword("postgres");
+
+	@MockBean
+	private MessagePublisher messagePublisher;
 
 	@DynamicPropertySource
 	static void configureProperties(DynamicPropertyRegistry registry) {

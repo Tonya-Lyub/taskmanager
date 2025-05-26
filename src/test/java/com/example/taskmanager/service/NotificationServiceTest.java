@@ -10,6 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -30,7 +31,12 @@ class NotificationServiceTest {
     @Test
     void createNotification_ShouldSaveAndReturnNotification() {
         // Arrange
-        Notification notification = new Notification("Test notification", "user1");
+        Notification notification = Notification.builder()
+            .message("Test notification")
+            .userId("user1")
+            .read(false)
+            .createdAt(LocalDateTime.now())
+            .build();
         when(notificationRepository.save(any(Notification.class))).thenReturn(notification);
 
         // Act
@@ -47,8 +53,8 @@ class NotificationServiceTest {
         // Arrange
         String userId = "user1";
         List<Notification> expectedNotifications = Arrays.asList(
-            new Notification("Notification 1", userId),
-            new Notification("Notification 2", userId)
+            Notification.builder().message("Notification 1").userId(userId).read(false).createdAt(LocalDateTime.now()).build(),
+            Notification.builder().message("Notification 2").userId(userId).read(false).createdAt(LocalDateTime.now()).build()
         );
         when(notificationRepository.findByUserIdOrderByCreatedAtDesc(userId)).thenReturn(expectedNotifications);
 
@@ -65,8 +71,8 @@ class NotificationServiceTest {
         // Arrange
         String userId = "user1";
         List<Notification> expectedNotifications = Arrays.asList(
-            new Notification("Notification 1", userId),
-            new Notification("Notification 2", userId)
+            Notification.builder().message("Notification 1").userId(userId).read(false).createdAt(LocalDateTime.now()).build(),
+            Notification.builder().message("Notification 2").userId(userId).read(false).createdAt(LocalDateTime.now()).build()
         );
         when(notificationRepository.findByUserIdAndReadFalseOrderByCreatedAtDesc(userId)).thenReturn(expectedNotifications);
 
@@ -82,7 +88,12 @@ class NotificationServiceTest {
     void markAsRead_ShouldMarkNotificationAsRead() {
         // Arrange
         String notificationId = "notification1";
-        Notification notification = new Notification("Test notification", "user1");
+        Notification notification = Notification.builder()
+            .message("Test notification")
+            .userId("user1")
+            .read(false)
+            .createdAt(LocalDateTime.now())
+            .build();
         when(notificationRepository.findById(notificationId)).thenReturn(Optional.of(notification));
         when(notificationRepository.save(any(Notification.class))).thenReturn(notification);
 
