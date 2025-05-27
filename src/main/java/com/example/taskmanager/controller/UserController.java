@@ -12,6 +12,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/users")
+@CrossOrigin(origins = "*")
 public class UserController {
     private final UserService userService;
     private final TaskService taskService;
@@ -23,7 +24,7 @@ public class UserController {
         this.notificationService = notificationService;
     }
 
-    @PostMapping
+    @PostMapping(consumes = "application/json", produces = "application/json")
     public ResponseEntity<User> registerUser(@RequestBody User user) {
         try {
             return ResponseEntity.status(HttpStatus.CREATED).body(userService.registerUser(user));
@@ -32,7 +33,7 @@ public class UserController {
         }
     }
 
-    @GetMapping("/{username}")
+    @GetMapping(value = "/{username}", produces = "application/json")
     public ResponseEntity<Map<String, Object>> getUserInfo(@PathVariable String username) {
         return userService.findByUsername(username)
                 .map(user -> {

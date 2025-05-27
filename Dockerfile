@@ -4,15 +4,20 @@ FROM eclipse-temurin:17-jdk-alpine
 # Создаем рабочую директорию
 WORKDIR /app
 
-# Копируем файлы сборки
+# Копируем только файлы, необходимые для загрузки зависимостей
 COPY gradlew .
 COPY gradle gradle
 COPY build.gradle .
 COPY settings.gradle .
-COPY src src
 
 # Даем права на выполнение gradlew
 RUN chmod +x ./gradlew
+
+# Загружаем зависимости (этот слой будет кэшироваться)
+RUN ./gradlew dependencies
+
+# Копируем исходный код
+COPY src src
 
 # Собираем приложение
 RUN ./gradlew build -x test
